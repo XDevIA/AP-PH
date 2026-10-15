@@ -336,12 +336,16 @@ html.m.sw .bleed{aspect-ratio:auto;background-size:contain;background-repeat:no-
 html.m.sw .bl-tag{bottom:auto;top:calc(42% + 33vw);left:0}
 html.m.sw .bl-pn{display:none}
 html.m.sw .closing3{justify-content:flex-start}
-.sw-ui,.sw-hint{display:none}
-html.m.sw .sw-ui{display:flex;position:fixed;left:50%;transform:translateX(-50%);bottom:calc(10px + env(safe-area-inset-bottom,0px));z-index:50;align-items:center;gap:6px;background:rgba(15,27,45,.78);color:#fff;border-radius:999px;padding:5px 6px;font:600 12px 'Manrope',system-ui,sans-serif;-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
-html.m.sw .sw-ui button{all:unset;width:30px;height:30px;display:grid;place-items:center;border-radius:50%;font-size:18px;line-height:1;cursor:pointer}
-html.m.sw .sw-ui button:active{background:rgba(255,255,255,.18)}
-html.m.sw .sw-ui span{min-width:52px;text-align:center;font-variant-numeric:tabular-nums}
-html.m.sw .sw-hint{display:block;position:fixed;right:14px;top:50%;z-index:50;background:rgba(15,27,45,.78);color:#fff;font:600 12px 'Manrope',system-ui,sans-serif;padding:8px 12px;border-radius:999px;transition:opacity .6s;pointer-events:none}
+.sw-nav,.sw-hint{display:none}
+html.m.sw .sw-nav{display:block}
+html.m.sw .sw-btn{position:fixed;z-index:50;all:unset;position:fixed;width:38px;height:38px;border-radius:50%;display:grid;place-items:center;cursor:pointer;color:#0f1b2d;background:rgba(255,255,255,.32);border:1px solid rgba(255,255,255,.55);box-shadow:0 4px 18px rgba(15,27,45,.14);-webkit-backdrop-filter:blur(12px) saturate(1.4);backdrop-filter:blur(12px) saturate(1.4);transition:opacity .35s ease,transform .35s ease;-webkit-tap-highlight-color:transparent}
+html.m.sw .sw-btn svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+html.m.sw .sw-btn:active{transform:scale(.92)}
+html.m.sw .sw-next{right:max(8px,env(safe-area-inset-right,0px));top:50%;margin-top:-19px}
+html.m.sw .sw-prev{left:max(8px,env(safe-area-inset-left,0px));top:50%;margin-top:-19px}
+html.m.sw .sw-top{right:max(8px,env(safe-area-inset-right,0px));bottom:calc(18px + env(safe-area-inset-bottom,0px))}
+html.m.sw .sw-nav.hide .sw-btn,html.m.sw .sw-btn.off{opacity:0;pointer-events:none;transform:scale(.85)}
+html.m.sw .sw-hint{display:block;position:fixed;right:54px;top:50%;margin-top:-15px;z-index:50;color:#0f1b2d;background:rgba(255,255,255,.4);border:1px solid rgba(255,255,255,.6);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);font:600 12px 'Manrope',system-ui,sans-serif;padding:7px 12px;border-radius:999px;transition:opacity .6s;pointer-events:none}
 html.m.sw .page>*{flex:none}
 html.m.sw .ct-body>*{flex:none}
 html.m .box li b{display:inline}
@@ -351,15 +355,20 @@ function f(){de.classList.toggle('m',q.matches);de.classList.toggle('sw',q.match
 f();if(q.addEventListener)q.addEventListener('change',f);else if(q.addListener)q.addListener(f);
 document.addEventListener('DOMContentLoaded',function(){
   var pages=[].slice.call(document.querySelectorAll('section.page')),n=pages.length,b=document.body;
-  var ui=document.createElement('div');ui.className='sw-ui';
-  ui.innerHTML='<button type="button" aria-label="Página anterior">‹</button><span>1 / '+n+'</span><button type="button" aria-label="Próxima página">›</button>';
-  b.appendChild(ui);var lab=ui.querySelector('span'),bt=ui.querySelectorAll('button');
-  var hint=document.createElement('div');hint.className='sw-hint';hint.textContent='Arraste para o lado ›';b.appendChild(hint);
+  var ic={next:'<path d="M9 5l7 7-7 7"/>',prev:'<path d="M15 5l-7 7 7 7"/>',top:'<path d="M12 19V6M6 11l6-6 6 6"/>'};
+  var nav=document.createElement('div');nav.className='sw-nav';
+  function mk(k,l){var e=document.createElement('button');e.type='button';e.className='sw-btn sw-'+k;e.setAttribute('aria-label',l);e.innerHTML='<svg viewBox="0 0 24 24">'+ic[k]+'</svg>';nav.appendChild(e);return e}
+  var bp=mk('prev','Página anterior'),bn=mk('next','Próxima página'),bt=mk('top','Voltar ao topo da página');
+  b.appendChild(nav);
+  var hint=document.createElement('div');hint.className='sw-hint';hint.textContent='Arraste para o lado';b.appendChild(hint);
   function cur(){return Math.round(b.scrollLeft/Math.max(1,b.clientWidth))}
   function go(i){i=Math.max(0,Math.min(n-1,i));b.scrollTo({left:i*b.clientWidth,behavior:'smooth'})}
-  bt[0].onclick=function(){go(cur()-1)};bt[1].onclick=function(){go(cur()+1)};
-  var t;b.addEventListener('scroll',function(){lab.textContent=(cur()+1)+' / '+n;hint.style.opacity=0;clearTimeout(t);t=setTimeout(function(){var p=pages[cur()];if(p)p.scrollTop=p.scrollTop},120)},{passive:true});
-  setTimeout(function(){hint.style.opacity=0},4000);
+  function upd(){var i=cur(),p=pages[i];bp.classList.toggle('off',i===0);bn.classList.toggle('off',i===n-1);bt.classList.toggle('off',!p||p.scrollTop<120)}
+  bp.onclick=function(){go(cur()-1)};bn.onclick=function(){go(cur()+1)};
+  bt.onclick=function(){var p=pages[cur()];if(p)p.scrollTo({top:0,behavior:'smooth'})};
+  var t;function moving(){nav.classList.add('hide');hint.style.opacity=0;clearTimeout(t);t=setTimeout(function(){upd();nav.classList.remove('hide')},900)}
+  document.addEventListener('scroll',moving,{passive:true,capture:true});
+  upd();setTimeout(function(){hint.style.opacity=0},3500);
   document.addEventListener('keydown',function(e){if(!de.classList.contains('sw'))return;if(e.key==='ArrowRight')go(cur()+1);if(e.key==='ArrowLeft')go(cur()-1)});
 });
 })();</script>
