@@ -7,30 +7,28 @@
 <meta property="og:title" content="Apartamento Phelipe em 360°">
 <meta property="og:image" content="https://ap-ph.vercel.app/og.jpg">
 <link rel="icon" href="../icon.png">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;700;800&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800&family=Manrope:wght@500;600;700&display=swap">
 <style>
 /* Layout: visor 360 ocupando a tela, barra de ambientes embaixo */
-:root{--bg:#ffffff;--fg:#14213a;--muted:#5f6b80;--brand:#1f6fd1;--chip:#eef3fa;--line:#dde4ee;
---sans:"Manrope",system-ui,-apple-system,"Segoe UI",sans-serif}
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0f1520;--fg:#eef2f8;--muted:#9aa6ba;--brand:#5aa0ff;--chip:#1a2433;--line:#283447;color-scheme:dark}}
-:root[data-theme="dark"]{--bg:#0f1520;--fg:#eef2f8;--muted:#9aa6ba;--brand:#5aa0ff;--chip:#1a2433;--line:#283447;color-scheme:dark}
+:root{--bg:#ffffff;--fg:#1f2630;--muted:#6b7280;--brand:#0e7bef;--chip:#f4f6f9;--line:#e6e2da;--sans:"Manrope",system-ui,-apple-system,"Segoe UI",sans-serif;--disp:"Montserrat",system-ui,sans-serif;color-scheme:light}
 html,body{height:100%;margin:0}
 body{background:var(--bg);color:var(--fg);font-family:var(--sans);display:flex;flex-direction:column;
 padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:12px;box-sizing:border-box;gap:10px}
 header{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
-h1{margin:0;font-size:1.25rem;font-weight:800;letter-spacing:-.01em}
+h1{margin:0;font:800 1.3rem var(--disp);letter-spacing:-.02em;color:#0f1b2d}
 h1 b{color:var(--brand)}
 .back{color:var(--brand);font-weight:700;text-decoration:none;font-size:.9rem}.back:hover{text-decoration:underline}
 header .logo{height:34px;display:block}
 header .id{display:flex;align-items:center;gap:14px}
 header p{margin:0;color:var(--muted);font-size:.85rem}
-#view{flex:1;min-height:260px;border-radius:10px;overflow:hidden;position:relative;background:var(--chip);cursor:grab;touch-action:none}
+#view{flex:1;min-height:260px;border-radius:10px;border:1px solid var(--line);box-shadow:0 2px 14px rgba(15,27,45,.06);overflow:hidden;position:relative;background:var(--chip);cursor:grab;touch-action:none}
 #view:active{cursor:grabbing}
 #view canvas{display:block;width:100%;height:100%}
 #hint{position:absolute;left:12px;top:12px;background:rgba(15,21,32,.6);color:#fff;font-size:.78rem;padding:6px 10px;border-radius:6px;pointer-events:none}
 nav{display:flex;gap:8px;flex-wrap:wrap}
-nav button{font:700 .9rem var(--sans);color:var(--fg);background:var(--chip);border:1px solid var(--line);border-radius:999px;padding:8px 14px;cursor:pointer}
+nav button{font:600 .9rem var(--sans);color:var(--fg);background:var(--chip);border:1px solid var(--line);border-radius:999px;padding:8px 14px;cursor:pointer}
 nav button[aria-pressed="true"]{background:var(--brand);border-color:var(--brand);color:#fff}
+nav button:hover{border-color:var(--brand)}
 nav button:focus-visible{outline:2px solid var(--brand);outline-offset:2px}
 .spot{position:absolute;transform:translate(-50%,-50%);display:flex;flex-direction:column;align-items:center;gap:6px;background:none;border:0;padding:0;cursor:pointer;font:700 .85rem var(--sans);color:#fff}
 .spot .arrow{width:46px;height:46px;border-radius:50%;background:var(--brand);box-shadow:0 2px 10px rgba(0,0,0,.35);border:3px solid #fff;position:relative;transition:transform .15s}
