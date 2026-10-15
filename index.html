@@ -372,6 +372,19 @@ document.addEventListener('DOMContentLoaded',function(){
   document.addEventListener('keydown',function(e){if(!de.classList.contains('sw'))return;if(e.key==='ArrowRight')go(cur()+1);if(e.key==='ArrowLeft')go(cur()-1)});
 });
 })();</script>
+<style>/* acesso ao 360 */
+.v360{display:inline-flex;align-items:center;gap:3mm;align-self:flex-start;background:var(--blue);color:#fff;text-decoration:none;font:700 10.5pt var(--fb);padding:3.2mm 6mm 3.2mm 3.2mm;border-radius:20mm;box-shadow:0 1.5mm 5mm rgba(14,123,239,.35);transition:transform .15s,box-shadow .15s}
+.v360:hover{transform:translateY(-.5mm);box-shadow:0 2.5mm 7mm rgba(14,123,239,.45)}
+.v360:focus-visible{outline:.6mm solid #fff;outline-offset:.8mm}
+.v360 i{display:grid;place-items:center;width:9mm;height:9mm;border-radius:50%;background:#fff;color:var(--blue);font:800 7.5pt var(--fb);font-style:normal;letter-spacing:-.02em}
+.v360 small{display:block;font:500 7.5pt var(--fb);opacity:.85;letter-spacing:.02em}
+.cv-mid .v360{margin-top:7mm}
+html.m .v360{font-size:15px;padding:10px 20px 10px 10px;gap:12px;border-radius:999px}
+html.m .v360 i{width:38px;height:38px;font-size:12px}
+html.m .v360 small{font-size:12px}
+@media (prefers-reduced-motion:reduce){.v360{transition:none}}
+@media print{.v360{display:none}}
+</style>
 </head><body>
 <section class="page cover">
 <div class="cv-img" style="background-image:url(img/0db93ff114.jpg)"></div>
@@ -383,6 +396,7 @@ document.addEventListener('DOMContentLoaded',function(){
     <h1>Apartamento<br><em>Phelipe</em></h1>
     <div class="rule"></div>
     <p>NOW Residence · Carapicuíba · SP</p>
+    <a class="v360" href="360/"><i>360°</i><span>Entrar no apartamento<small>Visite cada ambiente por dentro</small></span></a>
   </div>
   <div class="cv-meta"><div><b>Cliente</b>Phelipe</div><div><b>Projeto</b>Daniel · Móveis X</div><div><b>Data</b>Outubro 2026</div></div>
 </div></section><section class="page concept">
@@ -955,6 +969,6 @@ document.addEventListener('DOMContentLoaded',function(){
 <path d="M240 210 C262 188 284 178 297 176" fill="none" stroke="#ffffff" stroke-width="0.6"/>
 </svg>
 <div class="c3-txt"><img src="img/ecf70b03e1.png" alt="Móveis X"><h2>Feito sob medida<br><em>para o seu jeito de viver.</em></h2><div class="rule"></div>
-<p>Projeto de marcenaria · Apartamento Phelipe · NOW Residence</p></div>
+<p>Projeto de marcenaria · Apartamento Phelipe · NOW Residence</p><a class="v360" href="360/"><i>360°</i><span>Ver o apartamento em 360°<small>Sala, cozinha, quartos e banheiro</small></span></a></div>
 <div class="c3-script">Do projeto<br>à realidade</div></section>
 </body></html>
