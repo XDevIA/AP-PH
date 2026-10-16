@@ -37,40 +37,50 @@ nav button:focus-visible{outline:2px solid var(--brand);outline-offset:2px}
 .spot .lbl{background:rgba(15,21,32,.72);padding:4px 10px;border-radius:999px;white-space:nowrap}
 .spot:focus-visible{outline:none}.spot:focus-visible .lbl{outline:2px solid #fff}
 @media (prefers-reduced-motion:reduce){.spot .arrow{transition:none}}
+.sw{position:absolute;right:12px;top:12px;z-index:3;display:flex;align-items:center;gap:10px;background:rgba(15,21,32,.72);color:#fff;border:0;border-radius:999px;padding:7px 14px 7px 8px;font:700 .85rem var(--sans);cursor:pointer}
+.sw .knob{width:42px;height:24px;border-radius:999px;background:#f2c94c;position:relative;transition:background .2s}
+.sw .knob::after{content:"";position:absolute;top:3px;left:21px;width:18px;height:18px;border-radius:50%;background:#fff;transition:left .2s}
+.sw[aria-pressed="true"] .knob{background:#4b5563}.sw[aria-pressed="true"] .knob::after{left:3px}
+.sw:focus-visible{outline:2px solid #fff;outline-offset:2px}
+@media (prefers-reduced-motion:reduce){.sw .knob,.sw .knob::after{transition:none}}
 </style>
 </head>
 <body>
 <header><div class="id"><img class="logo" src="../img/ecf70b03e1.png" alt="Móveis X Sob Medida"><h1>Apartamento Phelipe <b>360°</b></h1></div><a class="back" href="../">← Voltar ao projeto</a></header>
-<header style="margin-top:-4px"><p>Arraste para olhar em volta. Clique nas setas para ir de um ambiente para o outro.</p></header>
-<div id="view"><div id="hint">Carregando…</div></div>
+<header style="margin-top:-4px"><p>Arraste para olhar em volta. Clique nas setas para ir de um ambiente para o outro. Use o interruptor para apagar as luzes do teto e ver só os LEDs.</p></header>
+<div id="view"><div id="hint">Carregando…</div><button class="sw" id="sw" hidden aria-pressed="false" aria-label="Apagar as luzes do teto"><span class="knob" aria-hidden="true"></span><span id="swl">Luzes do teto acesas</span></button></div>
 <nav id="rooms"></nav>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script>
 // posição de cada foto 360 na planta (m) e portas para onde as setas apontam
 const ROOMS=[
- {name:"Sala",img:"sala.jpg?v=5",p:[3.55,-3.3],go:[["Cozinha",1,[4.1,-1.7]],["Dormitório 02",3,[4.74,-3.04]],["Dormitório 01",2,[2.42,-1.9]],["Banheiro",4,[2.6,-0.75]]]},
- {name:"Cozinha",img:"cozinha.jpg?v=5",p:[4.3,-1.05],go:[["Sala",0,[3.6,-3.0]],["Banheiro",4,[2.6,-0.75]]]},
- {name:"Dormitório 01",img:"dormitorio_01.jpg?v=5",p:[1.2,-2.4],go:[["Sala",0,[2.42,-1.9]]]},
- {name:"Dormitório 02",img:"dormitorio_02.jpg?v=5",p:[5.7,-3.1],go:[["Sala",0,[4.74,-3.04]]]},
- {name:"Banheiro",img:"banheiro.jpg?v=5",p:[1.75,-0.75],look:[0.45,-0.65],go:[["Cozinha",1,[2.6,-0.75]]]}];
+ {name:"Sala",img:"sala.jpg?v=6",p:[3.55,-3.3],go:[["Cozinha",1,[4.1,-1.7]],["Dormitório 02",3,[4.74,-3.04]],["Dormitório 01",2,[2.42,-1.9]],["Banheiro",4,[2.6,-0.75]]]},
+ {name:"Cozinha",img:"cozinha.jpg?v=6",p:[4.3,-1.05],go:[["Sala",0,[3.6,-3.0]],["Banheiro",4,[2.6,-0.75]]]},
+ {name:"Dormitório 01",img:"dormitorio_01.jpg?v=6",p:[1.2,-2.4],go:[["Sala",0,[2.42,-1.9]]]},
+ {name:"Dormitório 02",img:"dormitorio_02.jpg?v=6",p:[5.7,-3.1],go:[["Sala",0,[4.74,-3.04]]]},
+ {name:"Banheiro",img:"banheiro.jpg?v=6",p:[1.75,-0.75],look:[0.45,-0.65],go:[["Cozinha",1,[2.6,-0.75]]]}];
 const view=document.getElementById('view'),hint=document.getElementById('hint'),nav=document.getElementById('rooms');
 const renderer=new THREE.WebGLRenderer({antialias:true});renderer.setPixelRatio(Math.min(devicePixelRatio,2));
 view.prepend(renderer.domElement);renderer.outputEncoding=THREE.sRGBEncoding;
 const scene=new THREE.Scene(),cam=new THREE.PerspectiveCamera(80,1,.1,100);
 const geo=new THREE.SphereGeometry(10,64,40);geo.scale(-1,1,1);
 const mat=new THREE.MeshBasicMaterial();scene.add(new THREE.Mesh(geo,mat));
-const loader=new THREE.TextureLoader();let lon=180,lat=0,cur=0,spots=[];
+const loader=new THREE.TextureLoader();let lon=180,lat=0,cur=0,spots=[],night=false;
+const src=r=>night?r.img.replace('.jpg','_noite.jpg'):r.img;
 // direção na planta -> ponto na esfera (centro da foto = +X da planta, direita = -Y)
 function dirTo(from,to){const dx=to[0]-from[0],dy=to[1]-from[1],dist=Math.hypot(dx,dy);
  const u=.5+Math.atan2(-dy,dx)/(2*Math.PI),e=Math.max(-0.6,Math.atan2(0.7-1.55,dist)),th=Math.PI/2-e;
  return new THREE.Vector3(Math.cos(2*Math.PI*u)*Math.sin(th),Math.cos(th),Math.sin(2*Math.PI*u)*Math.sin(th)).multiplyScalar(5)}
-function load(i){cur=i;[...nav.children].forEach((b,j)=>b.setAttribute('aria-pressed',j===i));hint.textContent='Carregando…';
- spots.forEach(s=>s.el.remove());spots=[];
- loader.load(ROOMS[i].img,t=>{if(i!==cur){t.dispose();return}t.encoding=THREE.sRGBEncoding;if(mat.map)mat.map.dispose();mat.map=t;mat.needsUpdate=true;
+function load(i,keep){cur=i;[...nav.children].forEach((b,j)=>b.setAttribute('aria-pressed',j===i));hint.textContent='Carregando…';
+ if(!keep){spots.forEach(s=>s.el.remove());spots=[]}
+ const want=src(ROOMS[i]);loader.load(want,t=>{if(i!==cur||want!==src(ROOMS[i])){t.dispose();return}t.encoding=THREE.sRGBEncoding;if(mat.map)mat.map.dispose();mat.map=t;mat.needsUpdate=true;
+  if(keep){hint.textContent=ROOMS[i].name+(night?' · luzes do teto apagadas':'');draw();return}
   const r=ROOMS[i];spots=r.go.map(([label,to,door])=>{const el=document.createElement('button');el.className='spot';
    el.innerHTML='<span class="arrow" aria-hidden="true"></span><span class="lbl">'+label+'</span>';el.setAttribute('aria-label','Ir para '+label);
    el.onclick=()=>load(to);view.appendChild(el);return {el,v:dirTo(r.p,door)}});
-  const f=spots[0]?spots[0].v:null;lon=r.look?360*(.5+Math.atan2(-(r.look[1]-r.p[1]),r.look[0]-r.p[0])/(2*Math.PI)):180;lat=0;hint.textContent=r.name;draw()});}
+  const f=spots[0]?spots[0].v:null;lon=r.look?360*(.5+Math.atan2(-(r.look[1]-r.p[1]),r.look[0]-r.p[0])/(2*Math.PI)):180;lat=0;hint.textContent=r.name+(night?' · luzes do teto apagadas':'');draw()});}
+const sw=document.getElementById('sw');
+sw.onclick=()=>{night=!night;sw.setAttribute('aria-pressed',night);sw.setAttribute('aria-label',night?'Acender as luzes do teto':'Apagar as luzes do teto');document.getElementById('swl').textContent=night?'Só LEDs dos móveis':'Luzes do teto acesas';load(cur,true)};
 ROOMS.forEach((r,i)=>{const b=document.createElement('button');b.id='room'+i;b.textContent=r.name;b.onclick=()=>load(i);nav.appendChild(b)});
 function size(){const w=view.clientWidth,h=view.clientHeight;renderer.setSize(w,h,false);cam.aspect=w/h;cam.updateProjectionMatrix();draw()}
 const fwd=new THREE.Vector3();
@@ -80,7 +90,7 @@ function draw(){lat=Math.max(-85,Math.min(85,lat));const p=THREE.MathUtils.degTo
  spots.forEach(s=>{if(s.v.clone().normalize().dot(fwd)<0.15){s.el.hidden=true;return}
   const q=s.v.clone().project(cam);s.el.hidden=false;s.el.style.left=((q.x+1)/2*w)+'px';s.el.style.top=((1-q.y)/2*h)+'px'})}
 const pts=new Map();let pinch=0;
-view.addEventListener('pointerdown',e=>{if(e.target.closest('.spot'))return;view.setPointerCapture(e.pointerId);pts.set(e.pointerId,[e.clientX,e.clientY])});
+view.addEventListener('pointerdown',e=>{if(e.target.closest('.spot,.sw'))return;view.setPointerCapture(e.pointerId);pts.set(e.pointerId,[e.clientX,e.clientY])});
 view.addEventListener('pointermove',e=>{if(!pts.has(e.pointerId))return;const o=pts.get(e.pointerId);pts.set(e.pointerId,[e.clientX,e.clientY]);
  if(pts.size===1){const k=cam.fov/view.clientHeight;lon-=(e.clientX-o[0])*k;lat+=(e.clientY-o[1])*k;draw()}
  else if(pts.size===2){const [a,b]=[...pts.values()],d=Math.hypot(a[0]-b[0],a[1]-b[1]);if(pinch)zoom((pinch-d)*.15);pinch=d}});
