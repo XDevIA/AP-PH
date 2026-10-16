@@ -52,7 +52,7 @@ const ROOMS=[
  {name:"Cozinha",img:"cozinha.jpg?v=2",p:[4.3,-1.05],go:[["Sala",0,[3.6,-3.0]],["Banheiro",4,[2.6,-0.75]]]},
  {name:"Dormitório 01",img:"dormitorio_01.jpg?v=2",p:[1.2,-2.4],go:[["Sala",0,[2.42,-1.9]]]},
  {name:"Dormitório 02",img:"dormitorio_02.jpg?v=2",p:[5.7,-3.1],go:[["Sala",0,[4.74,-3.04]]]},
- {name:"Banheiro",img:"banheiro.jpg?v=2",p:[1.75,-0.75],go:[["Cozinha",1,[2.6,-0.75]]]}];
+ {name:"Banheiro",img:"banheiro.jpg?v=2",p:[1.75,-0.75],look:[0.45,-0.65],go:[["Cozinha",1,[2.6,-0.75]]]}];
 const view=document.getElementById('view'),hint=document.getElementById('hint'),nav=document.getElementById('rooms');
 const renderer=new THREE.WebGLRenderer({antialias:true});renderer.setPixelRatio(Math.min(devicePixelRatio,2));
 view.prepend(renderer.domElement);renderer.outputEncoding=THREE.sRGBEncoding;
@@ -70,7 +70,7 @@ function load(i){cur=i;[...nav.children].forEach((b,j)=>b.setAttribute('aria-pre
   const r=ROOMS[i];spots=r.go.map(([label,to,door])=>{const el=document.createElement('button');el.className='spot';
    el.innerHTML='<span class="arrow" aria-hidden="true"></span><span class="lbl">'+label+'</span>';el.setAttribute('aria-label','Ir para '+label);
    el.onclick=()=>load(to);view.appendChild(el);return {el,v:dirTo(r.p,door)}});
-  const f=spots[0]?spots[0].v:null;lon=180;lat=0;hint.textContent=r.name;draw()});}
+  const f=spots[0]?spots[0].v:null;lon=r.look?360*(.5+Math.atan2(-(r.look[1]-r.p[1]),r.look[0]-r.p[0])/(2*Math.PI)):180;lat=0;hint.textContent=r.name;draw()});}
 ROOMS.forEach((r,i)=>{const b=document.createElement('button');b.id='room'+i;b.textContent=r.name;b.onclick=()=>load(i);nav.appendChild(b)});
 function size(){const w=view.clientWidth,h=view.clientHeight;renderer.setSize(w,h,false);cam.aspect=w/h;cam.updateProjectionMatrix();draw()}
 const fwd=new THREE.Vector3();
