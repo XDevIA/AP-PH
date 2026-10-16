@@ -48,11 +48,11 @@ nav button:focus-visible{outline:2px solid var(--brand);outline-offset:2px}
 <script>
 // posição de cada foto 360 na planta (m) e portas para onde as setas apontam
 const ROOMS=[
- {name:"Sala",img:"sala.jpg?v=3",p:[3.55,-3.3],go:[["Cozinha",1,[4.1,-1.7]],["Dormitório 02",3,[4.74,-3.04]],["Dormitório 01",2,[2.42,-1.9]],["Banheiro",4,[2.6,-0.75]]]},
- {name:"Cozinha",img:"cozinha.jpg?v=3",p:[4.3,-1.05],go:[["Sala",0,[3.6,-3.0]],["Banheiro",4,[2.6,-0.75]]]},
- {name:"Dormitório 01",img:"dormitorio_01.jpg?v=3",p:[1.2,-2.4],go:[["Sala",0,[2.42,-1.9]]]},
- {name:"Dormitório 02",img:"dormitorio_02.jpg?v=3",p:[5.7,-3.1],go:[["Sala",0,[4.74,-3.04]]]},
- {name:"Banheiro",img:"banheiro.jpg?v=3",p:[1.75,-0.75],look:[0.45,-0.65],go:[["Cozinha",1,[2.6,-0.75]]]}];
+ {name:"Sala",img:"sala.jpg?v=4",p:[3.55,-3.3],go:[["Cozinha",1,[4.1,-1.7]],["Dormitório 02",3,[4.74,-3.04]],["Dormitório 01",2,[2.42,-1.9]],["Banheiro",4,[2.6,-0.75]]]},
+ {name:"Cozinha",img:"cozinha.jpg?v=4",p:[4.3,-1.05],go:[["Sala",0,[3.6,-3.0]],["Banheiro",4,[2.6,-0.75]]]},
+ {name:"Dormitório 01",img:"dormitorio_01.jpg?v=4",p:[1.2,-2.4],go:[["Sala",0,[2.42,-1.9]]]},
+ {name:"Dormitório 02",img:"dormitorio_02.jpg?v=4",p:[5.7,-3.1],go:[["Sala",0,[4.74,-3.04]]]},
+ {name:"Banheiro",img:"banheiro.jpg?v=4",p:[1.75,-0.75],look:[0.45,-0.65],go:[["Cozinha",1,[2.6,-0.75]]]}];
 const view=document.getElementById('view'),hint=document.getElementById('hint'),nav=document.getElementById('rooms');
 const renderer=new THREE.WebGLRenderer({antialias:true});renderer.setPixelRatio(Math.min(devicePixelRatio,2));
 view.prepend(renderer.domElement);renderer.outputEncoding=THREE.sRGBEncoding;
