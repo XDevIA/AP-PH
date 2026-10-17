@@ -54,11 +54,11 @@ nav button:focus-visible{outline:2px solid var(--brand);outline-offset:2px}
 <script>
 // posição de cada foto 360 na planta (m) e portas para onde as setas apontam
 const ROOMS=[
- {name:"Sala",img:"sala.jpg?v=7",p:[3.55,-3.3],go:[["Cozinha",1,[4.1,-1.7]],["Dormitório 02",3,[4.74,-3.04]],["Dormitório 01",2,[2.42,-1.9]],["Banheiro",4,[2.6,-0.75]]]},
+ {name:"Sala",img:"sala.jpg?v=7",p:[3.55,-3.3],go:[["Cozinha",1,[4.1,-1.7],[5.0,-0.3]],["Dormitório 02",3,[4.74,-3.04]],["Dormitório 01",2,[2.42,-1.9]],["Banheiro",4,[2.6,-0.75]]]},
  {name:"Cozinha",img:"cozinha.jpg?v=7",p:[4.3,-1.05],go:[["Sala",0,[3.6,-3.0]],["Banheiro",4,[2.6,-0.75]]]},
  {name:"Dormitório 01",img:"dormitorio_01.jpg?v=7",p:[1.2,-2.4],go:[["Sala",0,[2.42,-1.9]]]},
- {name:"Dormitório 02",img:"dormitorio_02.jpg?v=7",p:[5.7,-3.1],go:[["Sala",0,[4.74,-3.04]]]},
- {name:"Banheiro",img:"banheiro.jpg?v=7",p:[1.75,-0.75],look:[0.45,-0.65],go:[["Cozinha",1,[2.6,-0.75]]]}];
+ {name:"Dormitório 02",img:"dormitorio_02.jpg?v=7",p:[5.7,-3.1],go:[["Sala",0,[4.74,-3.04],[2.8,-2.4]]]},
+ {name:"Banheiro",img:"banheiro.jpg?v=7",p:[1.75,-0.75],look:[0.45,-0.65],go:[["Cozinha",1,[2.6,-0.75],[3.6,-3.0]]]}];
 const view=document.getElementById('view'),hint=document.getElementById('hint'),nav=document.getElementById('rooms');
 const renderer=new THREE.WebGLRenderer({antialias:true});renderer.setPixelRatio(Math.min(devicePixelRatio,2));
 view.prepend(renderer.domElement);renderer.outputEncoding=THREE.sRGBEncoding;
@@ -71,14 +71,16 @@ const src=r=>night?r.img.replace('.jpg','_noite.jpg'):r.img;
 function dirTo(from,to){const dx=to[0]-from[0],dy=to[1]-from[1],dist=Math.hypot(dx,dy);
  const u=.5+Math.atan2(-dy,dx)/(2*Math.PI),e=Math.max(-0.6,Math.atan2(0.7-1.55,dist)),th=Math.PI/2-e;
  return new THREE.Vector3(Math.cos(2*Math.PI*u)*Math.sin(th),Math.cos(th),Math.sin(2*Math.PI*u)*Math.sin(th)).multiplyScalar(5)}
-function load(i,keep){cur=i;[...nav.children].forEach((b,j)=>b.setAttribute('aria-pressed',j===i));hint.textContent='Carregando…';
+const lonOf=(dx,dy)=>360*(.5+Math.atan2(-dy,dx)/(2*Math.PI));
+// ao passar por uma porta: olha na direção em que andou (porta -> centro do ambiente) ou para o ponto 'face'
+function load(i,keep,head){cur=i;[...nav.children].forEach((b,j)=>b.setAttribute('aria-pressed',j===i));hint.textContent='Carregando…';
  if(!keep){spots.forEach(s=>s.el.remove());spots=[]}
  const want=src(ROOMS[i]);loader.load(want,t=>{if(i!==cur||want!==src(ROOMS[i])){t.dispose();return}t.encoding=THREE.sRGBEncoding;if(mat.map)mat.map.dispose();mat.map=t;mat.needsUpdate=true;
   if(keep){hint.textContent=ROOMS[i].name+(night?' · luzes do teto apagadas':'');draw();return}
-  const r=ROOMS[i];spots=r.go.map(([label,to,door])=>{const el=document.createElement('button');el.className='spot';
+  const r=ROOMS[i];spots=r.go.map(([label,to,door,face])=>{const el=document.createElement('button');el.className='spot';
    el.innerHTML='<span class="arrow" aria-hidden="true"></span><span class="lbl">'+label+'</span>';el.setAttribute('aria-label','Ir para '+label);
-   el.onclick=()=>load(to);view.appendChild(el);return {el,v:dirTo(r.p,door)}});
-  const f=spots[0]?spots[0].v:null;lon=r.look?360*(.5+Math.atan2(-(r.look[1]-r.p[1]),r.look[0]-r.p[0])/(2*Math.PI)):180;lat=0;hint.textContent=r.name+(night?' · luzes do teto apagadas':'');draw()});}
+   el.onclick=()=>{const q=ROOMS[to].p;load(to,false,face?lonOf(face[0]-q[0],face[1]-q[1]):lonOf(q[0]-door[0],q[1]-door[1]))};view.appendChild(el);return {el,v:dirTo(r.p,door)}});
+  const f=spots[0]?spots[0].v:null;lon=head!=null?head:r.look?360*(.5+Math.atan2(-(r.look[1]-r.p[1]),r.look[0]-r.p[0])/(2*Math.PI)):180;lat=0;hint.textContent=r.name+(night?' · luzes do teto apagadas':'');draw()});}
 const sw=document.getElementById('sw');
 sw.onclick=()=>{night=!night;sw.setAttribute('aria-pressed',night);sw.setAttribute('aria-label',night?'Acender as luzes do teto':'Apagar as luzes do teto');document.getElementById('swl').textContent=night?'Só LEDs dos móveis':'Luzes do teto acesas';load(cur,true)};
 ROOMS.forEach((r,i)=>{const b=document.createElement('button');b.id='room'+i;b.textContent=r.name;b.onclick=()=>load(i);nav.appendChild(b)});
